@@ -1,7 +1,7 @@
 package main
 
 import (
-	authRegister "pp-model-shop-backend/auth-controller"
+	authRegister "pp-model-shop-backend/controller/auth-controller"
 	pp_model_schema "pp-model-shop-backend/database"
 
 	"github.com/gin-gonic/gin"
