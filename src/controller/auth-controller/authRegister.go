@@ -3,10 +3,14 @@ package authRegister
 import (
 	"fmt"
 	"net/http"
+	"os"
 	pp_model_schema "pp-model-shop-backend/database"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -19,6 +23,11 @@ type InputRegister struct {
 type Playload struct {
 	UserName string
 	Role     pp_model_schema.RoleType
+}
+
+type MyCustomClaims struct {
+	Playload Playload
+	jwt.RegisteredClaims
 }
 
 func Register(c *gin.Context) {
@@ -65,16 +74,26 @@ func Register(c *gin.Context) {
 
 	pp_model_schema.Instance.Create(&user)
 
-	users := Playload{
-		UserName: user.UserName,
-		Role:     pp_model_schema.RoleType(user.Role),
+	userDB := Playload{UserName: user.UserName,
+		Role: pp_model_schema.RoleType(user.Role)}
+
+	claim := MyCustomClaims{
+		Playload: userDB,
+
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(168 * time.Hour)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now()),
+		},
 	}
-	// bytes, err := json.Marshal(users)
+	godotenv.Load()
+	secret_key := os.Getenv("SECRET_KEY")
+	var mySigningKey = []byte(secret_key)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
+	AccessToken, err := token.SignedString(mySigningKey)
+	fmt.Println(AccessToken, err)
 
-	// playload := string(bytes)
-
-	c.JSON(http.StatusCreated, gin.H{"register": users})
-	return
+	c.JSON(http.StatusCreated, gin.H{"User": userDB, "AccessToken": AccessToken})
 }
 
 func checkUserName(data string) string {
