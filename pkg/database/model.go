@@ -1,10 +1,8 @@
-package pp_model_schema
+package databases
 
 import (
-	"os"
+	"time"
 
-	"github.com/joho/godotenv"
-	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -24,6 +22,7 @@ type User struct {
 	Role     RoleType  `gorm:"default:USER"`
 	Address  []Address `gorm:"foreignKey:UserId;refernces:Id"`
 	Cart     []Cart    `gorm:"foreignKey:UserId;refernces:Id"`
+	Order    []Order   `gorm:"foreignKey:UserId;refernces:Id"`
 }
 
 type Address struct {
@@ -34,6 +33,7 @@ type Address struct {
 	Address   string
 	Phone     string
 	UserId    int
+	Order     []Order `gorm:"foreignKey:AddressId;refernces:Id"`
 }
 
 type Type string
@@ -55,6 +55,7 @@ type Product struct {
 	IsActive     bool           `gorm:"default:true"`
 	ImageProduct []ImageProduct `gorm:"foreignKey:ProductId;refernces:Id"`
 	Cart         []Cart         `gorm:"foreignKey:ProductId;refernces:Id"`
+	OrderItem    []OrderItem    `gorm:"foreignKey:ProductId;refernces:Id"`
 }
 
 type ImageProduct struct {
@@ -73,18 +74,31 @@ type Cart struct {
 	ProductId  int
 }
 
-var (
-	Instance *gorm.DB
+type PaymentStatus string
+
+const (
+	PENDING = "PENDING"
+	SUCCESS = "SUCCESS"
 )
 
-func CreateDataBase() {
-	godotenv.Load()
-	dsn := os.Getenv("DATABASE")
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
-	db.AutoMigrate(&User{}, &Address{}, &Product{}, &ImageProduct{}, &Cart{})
-	Instance = db
+type Order struct {
+	gorm.Model
+	ID            int `gorm:"AUTO_INCREMENT"`
+	TotalPrice    float32
+	QrImageUrl    string
+	SlipUrl       string
+	PaymentDate   time.Time
+	PaymentStatus PaymentStatus
+	UserId        int
+	AddressId     int
+	OrderItem     []OrderItem `gorm:"foreignKey:OrderId;refernces:Id"`
+}
 
+type OrderItem struct {
+	gorm.Model
+	ID         int `gorm:"AUTO_INCREMENT"`
+	Quantity   int
+	TotalPrice int
+	ProductId  int
+	OrderId    int
 }
