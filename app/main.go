@@ -13,7 +13,7 @@ func main() {
 	r := gin.Default()
 	r.Use(cors.Default())
 	router := r.Group("")
-	routes.AddRoutes(router)
+	routes.Routes(router)
 	// r.POST("/register", controllers.Register)
 	r.Run("localhost:8008") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
