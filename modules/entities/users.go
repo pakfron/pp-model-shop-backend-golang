@@ -1,4 +1,4 @@
-package entities
+package entities_user
 
 import "github.com/golang-jwt/jwt/v5"
 
@@ -41,4 +41,20 @@ type Playload struct {
 type MyCustomClaims struct {
 	Playload Playload
 	jwt.RegisteredClaims
+}
+
+type UserLoginReq struct {
+	UserName string `json:"username" binding:"required" validate:"required,max=16,min=3"`
+	PassWord string `json:"password" binding:"required" validate:"required,max=16,min=3"`
+}
+
+type UserLoginRes struct {
+	UserName    string
+	Role        RoleType
+	AccessToken string
+}
+
+type DecryptPassword struct {
+	HashPassword []byte
+	PassWord     []byte
 }
