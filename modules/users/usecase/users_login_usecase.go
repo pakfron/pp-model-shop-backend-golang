@@ -6,6 +6,7 @@ import (
 	"pp-model-shop-backend/modules/users/repositories"
 	databases "pp-model-shop-backend/pkg/database"
 
+	"github.com/go-playground/validator/v10"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -13,6 +14,10 @@ func UserLoginCase(input *entities_user.UserLoginReq) (*entities_user.UserLoginR
 
 	user, err := repositories.CheckUserLogin(input)
 	if err != nil {
+		return nil, err
+	}
+
+	if err := validateInputLogin(input); err != nil {
 		return nil, err
 	}
 
@@ -36,6 +41,20 @@ func UserLoginCase(input *entities_user.UserLoginReq) (*entities_user.UserLoginR
 	output := LoginRespone(user, accessToken)
 	return output, nil
 
+}
+
+func validateInputLogin(input *entities_user.UserLoginReq) error {
+
+	userRegisterRequest := entities_user.UserLoginValidate{
+		UserName: input.UserName,
+		PassWord: input.PassWord,
+	}
+
+	validate := validator.New()
+	if err := validate.Struct(&userRegisterRequest); err != nil {
+		return err
+	}
+	return nil
 }
 
 func DecryptPassword(input *entities_user.DecryptPassword) error {
