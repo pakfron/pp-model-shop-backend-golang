@@ -19,21 +19,23 @@ func Register(user *databases.User, hashPassword []byte) (*databases.User, error
 }
 
 func CheckCreateUser(input *entities_user.UserRegisterReq) error {
-	var userName databases.User
 
-	server.Instance.Where("user_name = ? AND email =?", input.UserName, input.Email).First(&userName)
-	if userName.UserName == input.UserName && userName.Email == input.Email {
+	var count int64
+
+	server.Instance.Model(&databases.User{}).Where("user_name = ? AND email =?", input.UserName, input.Email).Count(&count)
+	if count != 0 {
+		fmt.Println(count)
 		err := errors.New("UserName and Email Already Use")
-
 		return err
 	}
-	server.Instance.Where("user_name = ?", input.UserName).First(&userName)
-	if userName.UserName == input.UserName {
+
+	server.Instance.Model(&databases.User{}).Where("user_name = ?", input.UserName).Count(&count)
+	if count > 0 {
 		err := errors.New("UserName Already Use")
 		return err
 	}
-	server.Instance.Where("email = ?", input.Email).First(&userName)
-	if userName.Email == input.Email {
+	server.Instance.Model(&databases.User{}).Where("email = ?", input.Email).Count(&count)
+	if count > 0 {
 		err := errors.New("email Already Use")
 		return err
 	}

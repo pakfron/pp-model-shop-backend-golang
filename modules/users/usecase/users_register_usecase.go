@@ -13,22 +13,22 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func NewUserCase(input *entities_user.UserRegisterReq) (*entities_user.UserRegisterRes, error) {
+func NewUserCase(req *entities_user.UserRegisterReq) (*entities_user.UserRegisterRes, error) {
 
-	err := repositories.CheckCreateUser(input)
+	err := repositories.CheckCreateUser(req)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := validateInputRes(input); err != nil {
+	if err := validateInputRes(req); err != nil {
 		return nil, err
 	}
 
-	hashPassword, err := HashPassword(input.PassWord)
+	hashPassword, err := HashPassword(req.PassWord)
 	if err != nil {
 		return nil, err
 	}
-	inputDB := inputRegDB(input, hashPassword)
+	inputDB := inputRegDB(req, hashPassword)
 
 	user, err := repositories.Register(&inputDB, hashPassword)
 	if err != nil {
@@ -44,8 +44,15 @@ func NewUserCase(input *entities_user.UserRegisterReq) (*entities_user.UserRegis
 }
 
 func validateInputRes(input *entities_user.UserRegisterReq) error {
+
+	userRegisterRequest := entities_user.UserRegisterValidate{
+		UserName: input.UserName,
+		PassWord: input.PassWord,
+		Email:    input.Email,
+	}
+
 	validate := validator.New()
-	if err := validate.Struct(input); err != nil {
+	if err := validate.Struct(&userRegisterRequest); err != nil {
 		return err
 	}
 	return nil
