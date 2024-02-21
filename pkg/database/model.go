@@ -61,7 +61,7 @@ type Product struct {
 type ImageProduct struct {
 	gorm.Model
 	ID        int `gorm:"AUTO_INCREMENT"`
-	imageUrl  string
+	ImageUrl  string
 	ProductId int
 }
 
