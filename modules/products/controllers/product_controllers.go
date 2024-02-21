@@ -17,11 +17,10 @@ func AddProduct(c *gin.Context) {
 
 	product, err := product_usecase.CreateProduct(c, input)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.SaveUploadedFile(input.Image, "../assets/"+input.Image.Filename)
-	c.JSON(http.StatusCreated, gin.H{"test": product})
+	c.JSON(http.StatusCreated, gin.H{"addProduct": product})
 
 }

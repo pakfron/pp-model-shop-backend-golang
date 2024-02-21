@@ -19,10 +19,23 @@ type CreateProductReq struct {
 	Image  *multipart.FileHeader `form:"image" binding:"required"`
 }
 
-type CreateProudctRes struct {
+type URLProduct struct {
+	Url string
+}
+
+type CreateProductDB struct {
 	Name   string
 	Series string
 	Detail string
 	Price  float32
 	Type   Type
+}
+
+type CreateProudctRes struct {
+	Name     string
+	Series   string
+	Detail   string
+	Price    float32
+	Type     Type
+	ImageUrl string
 }
