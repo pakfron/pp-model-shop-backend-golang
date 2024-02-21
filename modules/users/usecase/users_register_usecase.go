@@ -2,7 +2,7 @@ package user_usecase
 
 import (
 	"os"
-	entities_user "pp-model-shop-backend/modules/entities"
+	entities "pp-model-shop-backend/modules/entities"
 	"pp-model-shop-backend/modules/users/repositories"
 	databases "pp-model-shop-backend/pkg/database"
 	"time"
@@ -13,7 +13,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func NewUserCase(req *entities_user.UserRegisterReq) (*entities_user.UserRegisterRes, error) {
+func NewUserCase(req *entities.UserRegisterReq) (*entities.UserRegisterRes, error) {
 
 	err := repositories.CheckCreateUser(req)
 	if err != nil {
@@ -43,9 +43,9 @@ func NewUserCase(req *entities_user.UserRegisterReq) (*entities_user.UserRegiste
 	return output, nil
 }
 
-func validateInputRes(input *entities_user.UserRegisterReq) error {
+func validateInputRes(input *entities.UserRegisterReq) error {
 
-	userRegisterRequest := entities_user.UserRegisterValidate{
+	userRegisterRequest := entities.UserRegisterValidate{
 		UserName: input.UserName,
 		PassWord: input.PassWord,
 		Email:    input.Email,
@@ -63,7 +63,7 @@ func HashPassword(input string) ([]byte, error) {
 	return bytes, err
 }
 
-func inputRegDB(input *entities_user.UserRegisterReq, hashPassword []byte) databases.User {
+func inputRegDB(input *entities.UserRegisterReq, hashPassword []byte) databases.User {
 
 	inputRegForDB := databases.User{
 		UserName: input.UserName,
@@ -76,12 +76,12 @@ func inputRegDB(input *entities_user.UserRegisterReq, hashPassword []byte) datab
 
 func createToken(input *databases.User) (*string, error) {
 
-	Playload := entities_user.Playload{
+	Playload := entities.Playload{
 		UserName: input.UserName,
-		Role:     entities_user.RoleType(input.Role),
+		Role:     entities.RoleType(input.Role),
 	}
 
-	claim := entities_user.MyCustomClaims{
+	claim := entities.MyCustomClaims{
 		Playload: Playload,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(168 * time.Hour)),
@@ -100,11 +100,11 @@ func createToken(input *databases.User) (*string, error) {
 	return &accessToken, nil
 }
 
-func RegisterRespone(input *databases.User, AccessToken *string) *entities_user.UserRegisterRes {
+func RegisterRespone(input *databases.User, AccessToken *string) *entities.UserRegisterRes {
 
-	output := entities_user.UserRegisterRes{
+	output := entities.UserRegisterRes{
 		UserName:    input.UserName,
-		Role:        entities_user.RoleType(input.Role),
+		Role:        entities.RoleType(input.Role),
 		AccessToken: *AccessToken,
 	}
 

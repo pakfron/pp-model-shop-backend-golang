@@ -3,7 +3,7 @@ package repositories
 import (
 	"errors"
 	"fmt"
-	entities_user "pp-model-shop-backend/modules/entities"
+	entities "pp-model-shop-backend/modules/entities"
 	"pp-model-shop-backend/modules/server"
 	databases "pp-model-shop-backend/pkg/database"
 )
@@ -18,7 +18,7 @@ func Register(user *databases.User, hashPassword []byte) (*databases.User, error
 	return user, nil
 }
 
-func CheckCreateUser(input *entities_user.UserRegisterReq) error {
+func CheckCreateUser(input *entities.UserRegisterReq) error {
 
 	var count int64
 
@@ -42,11 +42,11 @@ func CheckCreateUser(input *entities_user.UserRegisterReq) error {
 	return nil
 }
 
-func CheckUserLogin(input *entities_user.UserLoginReq) (*databases.User, error) {
+func CheckUserLogin(input *entities.UserLoginReq) (*databases.User, error) {
 
 	var user *databases.User
 
-	result := server.Instance.Where("user_name =?", input.UserName).First(&user)
+	result := server.Instance.Model(&databases.User{}).Where("user_name =?", input.UserName).First(&user)
 
 	if result.Error != nil {
 		return nil, result.Error

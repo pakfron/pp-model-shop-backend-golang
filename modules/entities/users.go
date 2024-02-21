@@ -1,4 +1,4 @@
-package entities_user
+package entities
 
 import "github.com/golang-jwt/jwt/v5"
 

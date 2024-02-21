@@ -2,7 +2,7 @@ package UserControllers
 
 import (
 	"net/http"
-	entities_user "pp-model-shop-backend/modules/entities"
+	entities "pp-model-shop-backend/modules/entities"
 	user_usecase "pp-model-shop-backend/modules/users/usecase"
 
 	"github.com/gin-gonic/gin"
@@ -14,7 +14,7 @@ type Error struct {
 
 func Register(c *gin.Context) {
 
-	var input *entities_user.UserRegisterReq
+	var input *entities.UserRegisterReq
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
@@ -30,7 +30,7 @@ func Register(c *gin.Context) {
 }
 
 func Login(c *gin.Context) {
-	var input *entities_user.UserLoginReq
+	var input *entities.UserLoginReq
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})

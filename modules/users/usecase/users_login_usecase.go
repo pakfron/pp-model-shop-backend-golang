@@ -2,7 +2,7 @@ package user_usecase
 
 import (
 	"errors"
-	entities_user "pp-model-shop-backend/modules/entities"
+	entities "pp-model-shop-backend/modules/entities"
 	"pp-model-shop-backend/modules/users/repositories"
 	databases "pp-model-shop-backend/pkg/database"
 
@@ -10,7 +10,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func UserLoginCase(input *entities_user.UserLoginReq) (*entities_user.UserLoginRes, error) {
+func UserLoginCase(input *entities.UserLoginReq) (*entities.UserLoginRes, error) {
 
 	user, err := repositories.CheckUserLogin(input)
 	if err != nil {
@@ -21,7 +21,7 @@ func UserLoginCase(input *entities_user.UserLoginReq) (*entities_user.UserLoginR
 		return nil, err
 	}
 
-	password := entities_user.DecryptPassword{
+	password := entities.DecryptPassword{
 		HashPassword: []byte(user.PassWord),
 		PassWord:     []byte(input.PassWord),
 	}
@@ -43,9 +43,9 @@ func UserLoginCase(input *entities_user.UserLoginReq) (*entities_user.UserLoginR
 
 }
 
-func validateInputLogin(input *entities_user.UserLoginReq) error {
+func validateInputLogin(input *entities.UserLoginReq) error {
 
-	userRegisterRequest := entities_user.UserLoginValidate{
+	userRegisterRequest := entities.UserLoginValidate{
 		UserName: input.UserName,
 		PassWord: input.PassWord,
 	}
@@ -57,7 +57,7 @@ func validateInputLogin(input *entities_user.UserLoginReq) error {
 	return nil
 }
 
-func DecryptPassword(input *entities_user.DecryptPassword) error {
+func DecryptPassword(input *entities.DecryptPassword) error {
 
 	err := bcrypt.CompareHashAndPassword(input.HashPassword, input.PassWord)
 
@@ -68,11 +68,11 @@ func DecryptPassword(input *entities_user.DecryptPassword) error {
 
 }
 
-func LoginRespone(input *databases.User, AccessToken *string) *entities_user.UserLoginRes {
+func LoginRespone(input *databases.User, AccessToken *string) *entities.UserLoginRes {
 
-	output := entities_user.UserLoginRes{
+	output := entities.UserLoginRes{
 		UserName:    input.UserName,
-		Role:        entities_user.RoleType(input.Role),
+		Role:        entities.RoleType(input.Role),
 		AccessToken: *AccessToken,
 	}
 	return &output
