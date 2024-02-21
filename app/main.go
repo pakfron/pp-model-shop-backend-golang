@@ -11,7 +11,7 @@ import (
 
 func main() {
 
-	server.CreateDataBase()
+	server.MigrateDatabase()
 	r := gin.Default()
 	r.Use(cors.Default())
 	router := r.Group("")

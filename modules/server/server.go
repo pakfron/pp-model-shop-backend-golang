@@ -17,7 +17,7 @@ var (
 	Instance *gorm.DB
 )
 
-func CreateDataBase() *gorm.DB {
+func MigrateDatabase() {
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 		logger.Config{
@@ -38,8 +38,36 @@ func CreateDataBase() *gorm.DB {
 	}
 	db.AutoMigrate(&databases.User{}, &databases.Address{}, &databases.Address{}, &databases.ImageProduct{},
 		&databases.Cart{}, &databases.Order{}, &databases.OrderItem{})
+	defer CloseDB(db)
 
-	Instance = db
+}
+
+func GetDB() *gorm.DB {
+
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+		logger.Config{
+			SlowThreshold: time.Second, // Slow SQL threshold
+			LogLevel:      logger.Info, // Log level
+			Colorful:      true,        // Disable color
+		},
+	)
+
+	godotenv.Load("../.env")
+	dsn := os.Getenv("DATABASE")
+	fmt.Printf("%v", &dsn)
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+		Logger: newLogger,
+	})
+	if err != nil {
+		panic("failed to connect database")
+	}
 
 	return db
+}
+
+func CloseDB(db *gorm.DB) error {
+
+	InstantDB, _ := db.DB()
+	return InstantDB.Close()
 }

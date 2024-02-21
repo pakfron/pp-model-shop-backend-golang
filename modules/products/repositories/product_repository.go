@@ -11,8 +11,9 @@ import (
 func CheckProduct(input *entities.CreateProductReq) error {
 
 	var count int64
-
-	server.Instance.Model(&databases.Product{}).Where("name =?", input.Name).Count(&count)
+	db := server.GetDB()
+	defer server.CloseDB(db)
+	db.Model(&databases.Product{}).Where("name =?", input.Name).Count(&count)
 
 	if count != 0 {
 		err := errors.New("product already exist")
@@ -23,8 +24,9 @@ func CheckProduct(input *entities.CreateProductReq) error {
 }
 
 func CreateProduct(input *databases.Product, imageUrl *entities.URLProduct) (*entities.CreateProudctRes, error) {
-
-	result := server.Instance.Model(databases.Product{}).Create(input)
+	db := server.GetDB()
+	defer server.CloseDB(db)
+	result := db.Model(databases.Product{}).Create(input)
 	fmt.Println(input)
 	if result.Error != nil {
 		return nil, result.Error
@@ -35,7 +37,7 @@ func CreateProduct(input *databases.Product, imageUrl *entities.URLProduct) (*en
 		ProductId: input.ID,
 	}
 
-	imageProductResult := server.Instance.Model(databases.ImageProduct{}).Create(&imageProduct)
+	imageProductResult := db.Model(databases.ImageProduct{}).Create(&imageProduct)
 	fmt.Println(imageProduct)
 	if imageProductResult.Error != nil {
 		return nil, imageProductResult.Error
